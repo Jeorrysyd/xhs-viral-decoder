@@ -1,0 +1,27 @@
+{
+  "name": "xhs-viral-decoder",
+  "display_name": "小红书爆款拆解师",
+  "version": "0.1.0",
+  "description": "Xiaohongshu viral content decoding toolkit — 6 composable sub-skills for content creators and self-media operators.",
+  "author": "Joyce Sun",
+  "license": "MIT",
+  "skills": [
+    "xhs-viral-pulse",
+    "xhs-account-decompose",
+    "xhs-matrix-identify",
+    "xhs-persona-synth",
+    "xhs-viral-rewrite",
+    "xhs-trend-scan"
+  ],
+  "platforms": {
+    "feishu": "complete",
+    "slack": "stub",
+    "telegram": "stub",
+    "whatsapp": "stub"
+  },
+  "dependencies": {
+    "xhs-mcp": ">=v2026.04.17",
+    "lark-cli": ">=1.0.19",
+    "python": ">=3.9"
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "_meta": {
+    "version": "0.1-auto",
+    "synthesized_at": "2026-04-27",
+    "source": "xhs auto-extracted from user_id (sample, anonymized)",
+    "lens_version": "xhs_stratum_guide v1",
+    "needs_user_review": true,
+    "raw_data": "raw/profile_<id>_2026-04-27.json"
+  },
+  "core_tags": [
+    "反套路心理观察家",
+    "认知拆解者"
+  ],
+  "secondary_tags": [
+    "深度探索者"
+  ],
+  "story_assets": [],
+  "story_assets_note": "If account is anonymized or bio is short, story_assets may be empty. Please add 1-2 personal experience anchors.",
+  "topic_focus": [
+    "亲密关系",
+    "原生家庭",
+    "内耗",
+    "完美主义",
+    "社交融入",
+    "情绪管理",
+    "自我认知",
+    "孤独"
+  ],
+  "tone_palette": [
+    "冷静",
+    "解构",
+    "反共识"
+  ],
+  "voice_signature_phrases": [
+    "X 的方法/秘诀/路径，永远不是 Y",
+    "不是 A，是 B",
+    "真相是",
+    "拆解一下",
+    "其实你"
+  ],
+  "persona_anchors_for_rewrite": {
+    "professional_id": "反套路心理观察家",
+    "career_stage": "持续输出中",
+    "audience_match": "25-35 岁城市职场，反思关系/自我/认知边界的人",
+    "differentiator": "不安抚 / 不给标准答案 / 解构主流叙事"
+  },
+  "form_capability": {
+    "图文卡片": true,
+    "图文长文": true,
+    "口播": false,
+    "vlog": false,
+    "视频": false
+  },
+  "constraints": [
+    "不要追热点 / 不写快餐内容",
+    "不卖课、不立大师人设",
+    "不用「教你 / 救你 / 一定要」俯视语气",
+    "不要写常规鸡汤 / N 步搞定型干货",
+    "不要安抚用户情绪——保持解构姿态"
+  ],
+  "validated_viral_formula": {
+    "primary": "[X 行为/目标] 的 [方法/秘诀/路径]，永远不是 [大众答案]",
+    "examples": [
+      "建立亲密关系的秘诀，永远不是坦诚和沟通 (3,433 赞)",
+      "融入群体的方法，永远不是努力找话题 (1,520 赞)"
+    ],
+    "next_steps_after_hook": "double down on this formula in future content",
+    "why_it_works": "已被该账号自身数据验证（≥5× median ROI）"
+  },
+  "_synthesis_notes": "## Sub-stratum classification: **cognitive**\n\n### Vote scores\n- cognitive: 57\n- howto: 3\n- healing: 0\n- academic: 0\n- womens_growth: 0\n- lifestyle: 0\n\n### Confidence\nClear signal — cognitive (score 57)\n\n### Self tags from bio\n['拆解思维陷阱', '用逻辑重建认知', '在小红书做一个不合时宜的深度探索者']\n\n### Form distribution\n{'图文卡片': True, '图文长文': True, '口播': False, 'vlog': False, '视频': False}\n"
+}

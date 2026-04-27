@@ -1,0 +1,50 @@
+# xhs-viral-decoder config
+# Copy to config.yaml and fill in your own values. config.yaml is gitignored.
+
+# ============== xhs-mcp service ==============
+xhs_mcp:
+  url: http://localhost:18060
+  # Where the xhs-mcp binary + cookies live (set during setup/01_install_xhs_mcp.md)
+  install_dir: ~/tools/xiaohongshu-mcp
+
+# ============== Feishu / Lark output ==============
+feishu:
+  enabled: true
+  identity: bot                      # bot | user
+  # Run `lark-cli drive +create-folder --name "小红书爆款拆解师"` once and paste token here
+  folder_token: REPLACE_WITH_YOUR_FOLDER_TOKEN
+  # Your feishu open_id — bot-created docs auto-grant full_access here
+  grantee_open_id: REPLACE_WITH_YOUR_OPEN_ID
+
+# ============== Slack output (STUB — see adapters/slack.md) ==============
+slack:
+  enabled: false
+  webhook_url: ""
+  channel: "#content-pulse"
+
+# ============== Telegram output (STUB — see adapters/telegram.md) ==============
+telegram:
+  enabled: false
+  bot_token: ""
+  chat_id: ""
+
+# ============== WhatsApp output (STUB — see adapters/whatsapp.md) ==============
+whatsapp:
+  enabled: false
+  twilio_sid: ""
+  twilio_token: ""
+  to_number: ""
+
+# ============== Workflow defaults ==============
+defaults:
+  # Default keywords for xhs-viral-pulse when not specified
+  keywords: [情绪管理, 内耗, 自我疗愈]
+  niche: 心理
+  # Default persona name (file at persona/<name>.json) — leave empty if no default
+  persona: ""
+
+# ============== Output paths ==============
+output:
+  base_dir: ./output                 # all artifacts go here, organized by date
+  # If true, also push docs to feishu folder (recommended). False = local-only mode.
+  push_to_platform: true

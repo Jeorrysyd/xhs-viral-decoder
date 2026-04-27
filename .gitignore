@@ -1,0 +1,29 @@
+# User config (each user has their own feishu folder token, persona, etc.)
+config.yaml
+
+# User-generated outputs
+output/
+raw/
+analysis/
+decompose/
+
+# User-specific personas (sample is in examples/)
+persona/*.json
+!persona/README.md
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+
+# Editor
+.vscode/
+.idea/
+.DS_Store
+
+# Cookies / secrets
+cookies.json
+.env

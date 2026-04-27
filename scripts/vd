@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# vd — convenience wrapper for the Python CLI
+# Usage: vd <subcommand> [options]
+#
+# Symlink this to a directory on your PATH:
+#   ln -s "$(pwd)/scripts/vd" /usr/local/bin/vd
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SKILL_ROOT="$(dirname "$SCRIPT_DIR")"
+exec python3 "$SKILL_ROOT/shared/lib/cli.py" "$@"
