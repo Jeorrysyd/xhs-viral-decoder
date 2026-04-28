@@ -1,18 +1,30 @@
 # config.yaml 字段说明
 
+## 自动配置（推荐）
+
 ```bash
-cp config.example.yaml config.yaml
-# 然后编辑 config.yaml
+bash scripts/setup_feishu.sh
 ```
 
-## 必填字段
+脚本会自动从 lark-cli 读取你的 open_id，创建飞书文件夹获取 folder_token，然后生成填好的 config.yaml。**大多数情况下你不需要手动编辑任何字段。**
+
+## 手动配置
+
+如果你需要手动调整：
+
+```bash
+cp config.example.yaml config.yaml
+# 编辑 config.yaml
+```
+
+### 必填字段（自动配置已帮你填好）
 
 | 字段 | 说明 |
 |---|---|
-| `feishu.folder_token` | 跑 `lark-cli drive +create-folder` 拿到的 token |
-| `feishu.grantee_open_id` | 你的飞书 open_id（bot 产物自动给你授权用） |
+| `feishu.folder_token` | 飞书文件夹 token（`setup_feishu.sh` 自动创建并填入） |
+| `feishu.grantee_open_id` | 你的飞书 open_id（`setup_feishu.sh` 自动检测并填入） |
 
-## 可选字段
+### 可选字段
 
 | 字段 | 默认 | 说明 |
 |---|---|---|
@@ -28,10 +40,6 @@ cp config.example.yaml config.yaml
 
 这三个 adapter 默认 `enabled: false`。要启用看 [adapters/](../adapters/) 下对应文档。
 
-## 在飞书 AI Agent 里调用 skill
-
-skill 在飞书里被调用时，跑的依然是本地的 `xhs-viral-decoder/` —— 飞书 Agent 通过 Claude Code 触发 skill，所以 `config.yaml` 在你的本机上配置即可。
-
 ## 跨账号场景
 
 如果你有多个小红书账号要分别拆解：
@@ -42,9 +50,3 @@ defaults:
 ```
 
 然后每个 persona 用 `xhs-persona-synth --nickname X` 各生成一份，存到 `persona/` 目录。
-
-调用时指定：
-```
-「按 persona X 改写本周爆款」
-「按 persona Y 改写本周爆款」
-```

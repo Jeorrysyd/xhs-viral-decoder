@@ -69,55 +69,63 @@ git clone https://github.com/Jeorrysyd/xhs-viral-decoder \
 > https://github.com/Jeorrysyd/xhs-viral-decoder
 
 ### 前置依赖
-本 skill 需要两个外部工具，按 setup/ 文档自装一次即可：
+本 skill 需要两个外部工具，**首次安装按下面「5 分钟上手」走一遍即可**：
 - **xhs-mcp**（数据抓取）→ [setup/01_install_xhs_mcp.md](setup/01_install_xhs_mcp.md)
-- **lark-cli**（飞书输出，强烈建议）→ [setup/02_install_lark_cli.md](setup/02_install_lark_cli.md)
+- **lark-cli**（飞书输出）→ 只需 `npm install -g @larksuite/cli` + `lark-cli config init`，然后跑 `scripts/setup_feishu.sh` 一键完成
 
 ---
 
 ## 5 分钟上手
 
-### 1. 安装
+### Step 1 · Clone + 装数据源
 
 ```bash
-# clone 到 Claude Code 的 skills 目录
+# clone skill
 git clone https://github.com/Jeorrysyd/xhs-viral-decoder ~/.claude/skills/xhs-viral-decoder
 
-# 或者本地链接
-ln -s /path/to/xhs-viral-decoder ~/.claude/skills/xhs-viral-decoder
+# 装 xhs-mcp（小红书数据抓取），详见 setup/01
+# macOS arm64 一行搞定：
+mkdir -p ~/tools/xiaohongshu-mcp && cd ~/tools/xiaohongshu-mcp
+curl -L -o xhs-mcp.tar.gz \
+  https://github.com/xpzouying/xiaohongshu-mcp/releases/latest/download/xiaohongshu-mcp-darwin-arm64.tar.gz
+tar xzf xhs-mcp.tar.gz && chmod +x xiaohongshu-*
+xattr -d com.apple.quarantine xiaohongshu-*          # macOS 解锁
+./xiaohongshu-login-darwin-arm64                      # 扫码登录小红书
+./xiaohongshu-mcp-darwin-arm64 &                      # 后台启动
 ```
 
-### 2. 装依赖（一次性）
+### Step 2 · 飞书一键配置
 
-需要两个外部工具：
-- **xhs-mcp** — 抓小红书数据（[setup/01_install_xhs_mcp.md](setup/01_install_xhs_mcp.md)）
-- **lark-cli** — 推飞书（[setup/02_install_lark_cli.md](setup/02_install_lark_cli.md)）
+只需要**两个前置操作**（[详细说明](setup/02_install_lark_cli.md)）：
 
-5 分钟跑通：[setup/00_quickstart.md](setup/00_quickstart.md)
-
-### 3. 配置
+1. 去 [飞书开放平台](https://open.feishu.cn/app) 创建自建应用，拿到 **App ID** + **App Secret**
+2. 终端里配好 lark-cli：
 
 ```bash
-cp config.example.yaml config.yaml
-# 编辑 config.yaml — 主要填 feishu.folder_token + grantee_open_id
+npm install -g @larksuite/cli
+lark-cli config init        # 填 App ID + App Secret，身份选 bot
 ```
 
-字段说明：[setup/03_config.md](setup/03_config.md)
+然后**一键搞定剩下所有**（自动创建飞书文件夹 + 自动检测 open_id + 自动生成 config.yaml）：
 
-### 4. 验证安装
+```bash
+bash ~/.claude/skills/xhs-viral-decoder/scripts/setup_feishu.sh
+```
+
+> 不需要手动复制 folder_token，不需要手动查 open_id，脚本全部自动完成。
+
+### Step 3 · 验证 & 开跑
 
 ```bash
 bash ~/.claude/skills/xhs-viral-decoder/tests/verify_install.sh
-# 期望输出：6/6 sub-skills detected | xhs-mcp: ✓ | lark-cli: ✓ | config.yaml: ✓
+# 期望：6/6 sub-skills ✓ | xhs-mcp ✓ | lark-cli ✓ | config.yaml ✓
 ```
-
-### 5. 跑第一个 workflow
 
 在 Claude Code（或飞书 AI agent）里说：
 
 > 「我账号是『真相拆解师』，帮我生成 persona」
 
-Claude 应该自动触发 `xhs-persona-synth`，产出落到你的飞书 folder。
+Claude 自动触发 `xhs-persona-synth`，产出落到你的飞书文件夹。
 
 ---
 
