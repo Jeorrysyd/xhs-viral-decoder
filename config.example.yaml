@@ -38,7 +38,10 @@ whatsapp:
 # ============== Workflow defaults ==============
 defaults:
   # Default keywords for xhs-viral-pulse when not specified
+  # Change to your own niche keywords, e.g.: [柴犬, 宠物], [美妆, 护肤], [穿搭, OOTD]
   keywords: [情绪管理, 内耗, 自我疗愈]
+  # Your niche — used in report titles. v0.2 auto-detects niche for persona, but this is still
+  # used for viral-pulse report headings. Examples: 宠物 / 美妆 / 旅行 / 心理 / 穿搭 / 职场
   niche: 心理
   # Default persona name (file at persona/<name>.json) — leave empty if no default
   persona: ""
