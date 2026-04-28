@@ -32,6 +32,32 @@ def _today() -> str:
     return datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d")
 
 
+def _parse_count(val) -> int:
+    """Parse XHS count values that may contain Chinese units (e.g. '6.2万')."""
+    if isinstance(val, (int, float)):
+        return int(val)
+    if not val:
+        return 0
+    s = str(val).strip()
+    if s.endswith("万"):
+        try:
+            return int(float(s[:-1]) * 10000)
+        except ValueError:
+            return 0
+    if s.endswith("亿"):
+        try:
+            return int(float(s[:-1]) * 100000000)
+        except ValueError:
+            return 0
+    try:
+        return int(s)
+    except ValueError:
+        try:
+            return int(float(s))
+        except ValueError:
+            return 0
+
+
 def _ensure_dir(p: str) -> Path:
     pp = Path(p)
     pp.mkdir(parents=True, exist_ok=True)
@@ -211,11 +237,11 @@ def cmd_persona_init(args):
     interactions = raw.get("interactions", [])
     for i in interactions:
         if i.get("type") == "follows":
-            profile["follow_count"] = int(i.get("count", 0))
+            profile["follow_count"] = _parse_count(i.get("count", 0))
         elif i.get("type") == "fans":
-            profile["follower_count"] = int(i.get("count", 0))
+            profile["follower_count"] = _parse_count(i.get("count", 0))
         elif i.get("type") == "interaction":
-            profile["total_engagement"] = int(i.get("count", 0))
+            profile["total_engagement"] = _parse_count(i.get("count", 0))
 
     feeds = []
     for f in raw.get("feeds", []):
@@ -226,7 +252,7 @@ def cmd_persona_init(args):
             "xsec_token": f.get("xsecToken"),
             "note_type": nc.get("type"),
             "title": nc.get("displayTitle", ""),
-            "likes": int(likes) if likes else 0,
+            "likes": _parse_count(likes),
         })
 
     nickname = profile["nickname"]
@@ -305,7 +331,7 @@ def cmd_viral_pulse(args):
                 "xsec_token": f["xsecToken"],
                 "title": nc.get("displayTitle", ""),
                 "note_type": nc.get("type"),
-                "likes": int(likes) if likes else 0,
+                "likes": _parse_count(likes),
                 "author_id": nc.get("user", {}).get("userId"),
                 "author_nickname": nc.get("user", {}).get("nickname", ""),
                 "url": f"https://www.xiaohongshu.com/search_result/{fid}?xsec_token={f['xsecToken']}&xsec_source=pc_search",
@@ -324,9 +350,9 @@ def cmd_viral_pulse(args):
         try:
             d = xhs.get_feed_detail(n["feed_id"], n["xsec_token"], base_url=cfg.xhs_mcp.url)
             note = d.get("data", {}).get("note", {}) if isinstance(d, dict) else {}
-            n["collects"] = int(note.get("interactInfo", {}).get("collectedCount", "0") or 0)
-            n["comments_count"] = int(note.get("interactInfo", {}).get("commentCount", "0") or 0)
-            n["shares"] = int(note.get("interactInfo", {}).get("sharedCount", "0") or 0)
+            n["collects"] = _parse_count(note.get("interactInfo", {}).get("collectedCount", "0"))
+            n["comments_count"] = _parse_count(note.get("interactInfo", {}).get("commentCount", "0"))
+            n["shares"] = _parse_count(note.get("interactInfo", {}).get("sharedCount", "0"))
             n["author_ip"] = note.get("ipLocation", "")
             n["content_excerpt"] = note.get("desc", "")[:500]
             n["publish_ts"] = note.get("time")
@@ -354,7 +380,7 @@ def cmd_viral_pulse(args):
             try:
                 p = xhs.user_profile(aid, n["xsec_token"], base_url=cfg.xhs_mcp.url)
                 interactions = p.get("interactions", [])
-                fans = next((int(i.get("count", 0)) for i in interactions if i.get("type") == "fans"), 0)
+                fans = next((_parse_count(i.get("count", 0)) for i in interactions if i.get("type") == "fans"), 0)
                 seen_authors[aid] = fans
             except Exception:
                 seen_authors[aid] = 0
@@ -451,7 +477,7 @@ def cmd_trend_scan(args):
                     "feed_id": fid,
                     "xsec_token": f["xsecToken"],
                     "title": nc.get("displayTitle", ""),
-                    "likes": int(likes) if likes else 0,
+                    "likes": _parse_count(likes),
                     "url": f"https://www.xiaohongshu.com/search_result/{fid}?xsec_token={f['xsecToken']}",
                     "keywords_matched": [kw],
                     "publish_ts": None,  # need detail call to get this
@@ -644,11 +670,11 @@ def cmd_account_decompose(args):
     }
     for i in raw.get("interactions", []):
         if i["type"] == "follows":
-            profile["follow_count"] = int(i["count"])
+            profile["follow_count"] = _parse_count(i["count"])
         elif i["type"] == "fans":
-            profile["follower_count"] = int(i["count"])
+            profile["follower_count"] = _parse_count(i["count"])
         elif i["type"] == "interaction":
-            profile["total_engagement"] = int(i["count"])
+            profile["total_engagement"] = _parse_count(i["count"])
 
     notes_summary = []
     for f in raw.get("feeds", []):
@@ -659,7 +685,7 @@ def cmd_account_decompose(args):
             "xsec_token": f.get("xsecToken"),
             "note_type": nc.get("type"),
             "title": nc.get("displayTitle", ""),
-            "likes": int(likes) if likes else 0,
+            "likes": _parse_count(likes),
             "url": f"https://www.xiaohongshu.com/user/profile/{user_id}/{f.get('id')}",
         })
     notes_summary.sort(key=lambda x: x["likes"], reverse=True)
