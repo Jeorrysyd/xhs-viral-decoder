@@ -6,12 +6,12 @@
   "author": "Joyce Sun",
   "license": "MIT",
   "skills": [
-    "xhs-viral-pulse",
-    "xhs-account-decompose",
-    "xhs-matrix-identify",
-    "xhs-persona-synth",
-    "xhs-viral-rewrite",
-    "xhs-trend-scan"
+    { "id": "xhs-viral-pulse",       "buckets": ["gather", "strategize"], "zh": "拆解周报爆款" },
+    { "id": "xhs-account-decompose", "buckets": ["gather"],               "zh": "单号深度拆解" },
+    { "id": "xhs-matrix-identify",   "buckets": ["gather"],               "zh": "矩阵账号识别" },
+    { "id": "xhs-persona-synth",     "buckets": ["strategize"],           "zh": "人设档案自生成" },
+    { "id": "xhs-viral-rewrite",     "buckets": ["write"],                "zh": "爆款人设改写" },
+    { "id": "xhs-trend-scan",        "buckets": ["gather"],               "zh": "新概念词识别" }
   ],
   "platforms": {
     "feishu": "complete",

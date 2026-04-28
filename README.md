@@ -1,8 +1,10 @@
 # 小红书爆款拆解师 · xhs-viral-decoder
 
-> **Claude Skill 工具包** — 6 个组合式 sub-skill，把"看大博主拆爆款 → 做选题 → 落地飞书文档"这条路径自动化。
+> **6 个组合式 Claude Skill**，把"看大博主拆爆款 → 做选题 → 出飞书文档"这条路径自动化。
 >
-> 给小红书自媒体、内容创业者、社交媒体运营者用。在飞书 / Slack / Telegram 里跟 AI Agent 自然语言聊，结果直接落到你的飞书云盘。
+> 给做品牌营销的、小红书自媒体创作者、内容运营者用。兼容 Claude Code / Codex CLI / Cursor / Windsurf 等支持 Agent Skills 规范的 AI 工具。配好飞书 CLI 后，**结果通过 lark-cli 直接出到你的飞书云盘**（不配也能跑，但只能拿到本地 JSON）。
+
+作者：Joyce ([@真相拆解师](https://www.xiaohongshu.com/user/profile/67ff1829000000000d008a98)，173 粉 / 100% 图文实验)
 
 ---
 
@@ -43,13 +45,43 @@
 
 ---
 
+## 在你的 AI Agent 里装
+
+### Claude Code（推荐）
+```bash
+git clone https://github.com/Jeorrysyd/xhs-viral-decoder \
+  ~/.claude/skills/xhs-viral-decoder
+```
+
+### Codex CLI
+```bash
+git clone https://github.com/Jeorrysyd/xhs-viral-decoder \
+  ~/.codex/skills/xhs-viral-decoder
+```
+
+### Cursor / Windsurf / Cline（MCP-aware Agent）
+暂未做 MCP wrapper——当前用下面的 paste-prompt 方式即可。
+
+### 国内 AI Agent（豆包 / Floatboat / WorkBuddy 等）
+把这段话粘给 AI:
+
+> 帮我装这个 skill，里面有 6 个小红书爆款拆解的子能力。装在标准 skills 目录，并按它的 setup/ 文档帮我装好两个依赖（xhs-mcp + lark-cli）：
+> https://github.com/Jeorrysyd/xhs-viral-decoder
+
+### 前置依赖
+本 skill 需要两个外部工具，按 setup/ 文档自装一次即可：
+- **xhs-mcp**（数据抓取）→ [setup/01_install_xhs_mcp.md](setup/01_install_xhs_mcp.md)
+- **lark-cli**（飞书输出，强烈建议）→ [setup/02_install_lark_cli.md](setup/02_install_lark_cli.md)
+
+---
+
 ## 5 分钟上手
 
 ### 1. 安装
 
 ```bash
 # clone 到 Claude Code 的 skills 目录
-git clone https://github.com/<your>/xhs-viral-decoder ~/.claude/skills/xhs-viral-decoder
+git clone https://github.com/Jeorrysyd/xhs-viral-decoder ~/.claude/skills/xhs-viral-decoder
 
 # 或者本地链接
 ln -s /path/to/xhs-viral-decoder ~/.claude/skills/xhs-viral-decoder
@@ -94,15 +126,15 @@ Claude 应该自动触发 `xhs-persona-synth`，产出落到你的飞书 folder�
 ```
 帮我生成 persona — 我昵称叫「<你的昵称>」
 
-跑下本周「情绪管理 / 内耗 / 自我疗愈」三个关键词的爆款周报
+跑下本周「美妆 / 护肤 / 成分党」三个关键词的爆款周报
 
 把刚才那份爆款用我人设改写一遍
 
-深度拆解这个博主：https://www.xiaohongshu.com/user/profile/<id>?xsec_token=<token>
+深度拆解我家品牌赛道这个对标号：https://www.xiaohongshu.com/user/profile/<id>?xsec_token=<token>
 
-找下心理赛道有哪些矩阵号 — 用 <url> 这个博主做对照
+找下母婴赛道有哪些矩阵号 — 用 <url> 这个博主做对照
 
-本周冒出哪些新概念词，按心理赛道
+本周冒出哪些新概念词，按知识付费赛道
 ```
 
 ---
@@ -142,18 +174,7 @@ xhs-viral-decoder/
 2. **飞书 first-class** — 默认推飞书，因为这是中文创作者的主要协作面
 3. **用户主动触发** — 不内置 cron，Claude Code 用户可以用 `/schedule` 单独配
 4. **prompt-template + LLM 协同** — rewrite 等高自由度任务，不用规则代码（输出会重复），靠 prompt 让 in-conversation Claude 出 bespoke 内容
-5. **6-stratum lens** — persona 不是简单 NLP，是按"小红书圈层视角"理解（认知派/治愈派/干货派/心理学派/女性成长派/生活感叙事派）
-
----
-
-## 当前赛道支持
-
-主航道：**心理 / 成长 / 职场 / 内耗** 类账号。
-
-扩展点（在 `shared/reference/xhs_stratum_guide.md` 里新增子圈层）：
-- 美食（粉丝调性 / 探店派 / 烹饪派）— 待社区贡献
-- 穿搭（OOTD / 通勤穿搭 / 学院风）— 待社区贡献
-- AI 工具 / 编程（已有部分笔记，待形成圈层 lens）
+5. **6-stratum lens** — persona 不是简单 NLP，是按"小红书圈层视角"理解。reference 里附了一份心理 / 成长 / 职场赛道的 6 子圈层 showcase，其他赛道用同样方法换名即可。
 
 ---
 
@@ -161,8 +182,7 @@ xhs-viral-decoder/
 
 - 提 issue 报问题或建议
 - 实现一个 adapter（Slack / Telegram / WhatsApp）
-- 加一个新赛道的 stratum guide
-- 增强 `xhs_stratum_guide.md` 的子圈层判定准确度
+- 提交你赛道的 stratum guide showcase 给 reference 库
 
 ---
 
