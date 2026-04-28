@@ -45,6 +45,19 @@ See [workflow.md](workflow.md).
 - **Pair with `xhs-matrix-identify`** if account looks matrix-ready (bio @ other accounts, multiple linked profiles)
 - **Pair with `xhs-persona-synth`** to use this account's persona insights for your own rewrite
 
+## Failure modes — feishu output is REQUIRED
+
+The skill **must** end with a Feishu doc URL handed back to the user. If feishu push fails for any reason, **stop and ask the user to fix the configuration**. Do NOT silently degrade to local-only output.
+
+| Failure | Action |
+|---|---|
+| `lark-cli` binary not in PATH | STOP. Tell user to install lark-cli per [setup/02_install_lark_cli.md](../../setup/02_install_lark_cli.md). |
+| `lark-cli` auth expired (`LarkAuthExpired`) | STOP. Tell user: `lark-cli auth login --as bot` |
+| Bot lacks scope (`LarkScopeMissing`) | STOP. Show the `scope_url` from the error; user grants in 1 click in 飞书 console. |
+| `config.yaml` missing `feishu.folder_token` | STOP. Tell user to edit `config.yaml`. |
+
+Local markdown / JSON files saved during the run are intermediate artifacts — they are **not** the deliverable.
+
 ## Examples
 
 See [examples.md](examples.md) and [../../examples/account_decompose_sample.md](../../examples/account_decompose_sample.md).

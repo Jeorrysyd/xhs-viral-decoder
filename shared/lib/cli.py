@@ -38,6 +38,55 @@ def _ensure_dir(p: str) -> Path:
     return pp
 
 
+def _push_to_feishu_or_exit(cfg, push_fn, *args, local_path_hint=None, **kwargs):
+    """Mandatory Feishu push. Exits with code 2/3 on failure (no silent fallback).
+
+    Joyce's policy: all skill outputs MUST land in Feishu. If lark-cli is missing,
+    auth expired, scope insufficient, or config wrong, this exits — it does NOT
+    quietly fall back to local-only output.
+
+    Exit codes:
+        2 — config error (push_to_platform=false, or missing folder_token)
+        3 — push attempted but failed at runtime
+    """
+    if not cfg.output.push_to_platform:
+        print(
+            "\n✗ Feishu output is required but config.yaml has output.push_to_platform=false.\n"
+            "  Set output.push_to_platform=true in config.yaml, or this skill cannot complete.",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+    try:
+        return push_fn(*args, **kwargs)
+    except lark.LarkScopeMissing as e:
+        print(f"\n✗ Bot lacks required Feishu scope: {e}", file=sys.stderr)
+        if e.scope_url:
+            print(f"  Grant scope at: {e.scope_url}", file=sys.stderr)
+        sys.exit(3)
+    except lark.LarkAuthExpired as e:
+        print(
+            f"\n✗ Feishu auth expired: {e}\n"
+            f"  Re-login: lark-cli auth login --as <identity>",
+            file=sys.stderr,
+        )
+        sys.exit(3)
+    except FileNotFoundError as e:
+        print(
+            f"\n✗ lark-cli not in PATH: {e}\n"
+            f"  Install: see setup/02_install_lark_cli.md",
+            file=sys.stderr,
+        )
+        sys.exit(3)
+    except lark.LarkError as e:
+        print(f"\n✗ Feishu push failed (mandatory output): {e}", file=sys.stderr)
+        if local_path_hint:
+            print(
+                f"  Local file kept at: {local_path_hint} for inspection (NOT a successful run)",
+                file=sys.stderr,
+            )
+        sys.exit(3)
+
+
 # ============== Subcommand: setup ==============
 def cmd_setup(args):
     """Check all dependencies."""
@@ -204,19 +253,16 @@ def cmd_persona_init(args):
     doc_md_path.write_text(doc_md, encoding="utf-8")
     print(f"  ✓ Persona docx markdown → {doc_md_path}")
 
-    # Push to feishu
-    if cfg.output.push_to_platform:
-        print("\nPushing to Feishu...")
-        try:
-            adapter = get_adapter("feishu", cfg)
-            doc_token = adapter.push_doc(
-                title=f"[人设档案] {nickname}_{_today()}",
-                markdown=doc_md,
-            )
-            print(f"  ✓ Feishu doc: https://www.feishu.cn/docx/{doc_token}")
-        except Exception as e:
-            print(f"  ⚠️  Feishu push failed: {e}")
-            print(f"  Local markdown still at: {doc_md_path}")
+    # Push to Feishu (REQUIRED — fail loudly, do NOT silently fall back to local)
+    print("\nPushing to Feishu...")
+    adapter = get_adapter("feishu", cfg)
+    doc_token = _push_to_feishu_or_exit(
+        cfg, adapter.push_doc,
+        title=f"[人设档案] {nickname}_{_today()}",
+        markdown=doc_md,
+        local_path_hint=str(doc_md_path),
+    )
+    print(f"  ✓ Feishu doc: https://www.feishu.cn/docx/{doc_token}")
 
     print(f"\n=== Done ===")
     print(f"Persona ready. Next: try `python3 -m shared.lib.cli viral-pulse --persona {nickname}`")
@@ -343,30 +389,27 @@ def cmd_viral_pulse(args):
     report.write_xlsx(csv_text, str(xlsx_path), widths=[5, 38, 8, 8, 8, 8, 8, 14, 9, 8, 16, 16, 22, 12, 50, 26])
     print(f"✓ Sheet xlsx → {xlsx_path}")
 
-    # Step 8: push to feishu
-    artifacts = {}
-    if cfg.output.push_to_platform:
-        print("\nPushing to Feishu...")
-        try:
-            adapter = get_adapter("feishu", cfg)
-            sheet_token = adapter.push_sheet(
-                title=f"{niche}赛道_原始数据_{_today()}",
-                xlsx_path=str(xlsx_path),
-            )
-            doc_token = adapter.push_doc(
-                title=f"{niche}赛道_本周爆款选题报告_{_today()}",
-                markdown=md,
-            )
-            artifacts = {"sheet_token": sheet_token, "doc_token": doc_token}
-            print(f"  ✓ Sheet: https://my.feishu.cn/sheets/{sheet_token}")
-            print(f"  ✓ Doc: https://www.feishu.cn/docx/{doc_token}")
-        except Exception as e:
-            print(f"  ⚠️  Feishu push failed: {e}")
-
-    if artifacts:
-        (out_dir / "feishu_artifacts.json").write_text(
-            json.dumps(artifacts, ensure_ascii=False, indent=2), encoding="utf-8"
-        )
+    # Step 8: push to Feishu (REQUIRED — both sheet and doc must succeed, exit on failure)
+    print("\nPushing to Feishu...")
+    adapter = get_adapter("feishu", cfg)
+    sheet_token = _push_to_feishu_or_exit(
+        cfg, adapter.push_sheet,
+        title=f"{niche}赛道_原始数据_{_today()}",
+        xlsx_path=str(xlsx_path),
+        local_path_hint=str(xlsx_path),
+    )
+    print(f"  ✓ Sheet: https://my.feishu.cn/sheets/{sheet_token}")
+    doc_token = _push_to_feishu_or_exit(
+        cfg, adapter.push_doc,
+        title=f"{niche}赛道_本周爆款选题报告_{_today()}",
+        markdown=md,
+        local_path_hint=str(md_path),
+    )
+    print(f"  ✓ Doc: https://www.feishu.cn/docx/{doc_token}")
+    artifacts = {"sheet_token": sheet_token, "doc_token": doc_token}
+    (out_dir / "feishu_artifacts.json").write_text(
+        json.dumps(artifacts, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
 
     print(f"\n=== Done ===")
     print(f"Output: {out_dir}")
@@ -433,18 +476,16 @@ def cmd_trend_scan(args):
     md_path.write_text(md, encoding="utf-8")
     print(f"✓ Report → {md_path}")
 
-    # Push
-    if cfg.output.push_to_platform:
-        print("\nPushing to Feishu...")
-        try:
-            adapter = get_adapter("feishu", cfg)
-            doc_token = adapter.push_doc(
-                title=f"[趋势] {niche}_新概念词_{_today()}",
-                markdown=md,
-            )
-            print(f"  ✓ Doc: https://www.feishu.cn/docx/{doc_token}")
-        except Exception as e:
-            print(f"  ⚠️  Feishu push failed: {e}")
+    # Push to Feishu (REQUIRED — fail loudly)
+    print("\nPushing to Feishu...")
+    adapter = get_adapter("feishu", cfg)
+    doc_token = _push_to_feishu_or_exit(
+        cfg, adapter.push_doc,
+        title=f"[趋势] {niche}_新概念词_{_today()}",
+        markdown=md,
+        local_path_hint=str(md_path),
+    )
+    print(f"  ✓ Doc: https://www.feishu.cn/docx/{doc_token}")
 
     print(f"\n=== Done ===\nOutput: {out_dir}")
 
@@ -540,16 +581,31 @@ def cmd_viral_rewrite_merge(args):
     pulse_md_path.write_text(new_md, encoding="utf-8")
     print(f"✓ Updated report → {pulse_md_path}")
 
-    if cfg.output.push_to_platform:
-        artifacts_path = pulse_dir / "feishu_artifacts.json"
-        if artifacts_path.exists():
-            artifacts = json.loads(artifacts_path.read_text(encoding="utf-8"))
-            doc_token = artifacts.get("doc_token")
-            if doc_token:
-                print(f"\nUpdating Feishu doc {doc_token}...")
-                adapter = get_adapter("feishu", cfg)
-                adapter.update_doc(doc_token, new_md)
-                print(f"  ✓ Doc updated: https://www.feishu.cn/docx/{doc_token}")
+    # Update the original viral-pulse Feishu doc with §六 (REQUIRED — must succeed)
+    if not cfg.output.push_to_platform:
+        print(
+            "\n✗ Feishu output is required but config.yaml has output.push_to_platform=false.\n"
+            "  Set output.push_to_platform=true in config.yaml.",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+    artifacts_path = pulse_dir / "feishu_artifacts.json"
+    if not artifacts_path.exists():
+        print(
+            f"\n✗ Cannot find {artifacts_path} — viral-pulse must run first to create the original Feishu doc.\n"
+            f"  Re-run viral-pulse, then retry this merge.",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+    artifacts = json.loads(artifacts_path.read_text(encoding="utf-8"))
+    doc_token = artifacts.get("doc_token")
+    if not doc_token:
+        print(f"\n✗ doc_token missing from {artifacts_path}.", file=sys.stderr)
+        sys.exit(2)
+    print(f"\nUpdating Feishu doc {doc_token}...")
+    adapter = get_adapter("feishu", cfg)
+    _push_to_feishu_or_exit(cfg, adapter.update_doc, doc_token, new_md, local_path_hint=str(pulse_md_path))
+    print(f"  ✓ Doc updated: https://www.feishu.cn/docx/{doc_token}")
 
 
 # ============== Subcommand: account-decompose / matrix-identify ==============
@@ -634,16 +690,16 @@ def cmd_account_decompose(args):
     md_path.write_text(md, encoding="utf-8")
     print(f"✓ Report → {md_path}")
 
-    if cfg.output.push_to_platform:
-        try:
-            adapter = get_adapter("feishu", cfg)
-            doc_token = adapter.push_doc(
-                title=f"[拆解] {profile['nickname']}_{_today()}",
-                markdown=md,
-            )
-            print(f"  ✓ Doc: https://www.feishu.cn/docx/{doc_token}")
-        except Exception as e:
-            print(f"  ⚠️  Feishu push failed: {e}")
+    # Push to Feishu (REQUIRED — fail loudly)
+    print("\nPushing to Feishu...")
+    adapter = get_adapter("feishu", cfg)
+    doc_token = _push_to_feishu_or_exit(
+        cfg, adapter.push_doc,
+        title=f"[拆解] {profile['nickname']}_{_today()}",
+        markdown=md,
+        local_path_hint=str(md_path),
+    )
+    print(f"  ✓ Doc: https://www.feishu.cn/docx/{doc_token}")
 
 
 def cmd_matrix_identify(args):

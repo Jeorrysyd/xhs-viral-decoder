@@ -47,6 +47,19 @@ Common chains:
 - `xhs-viral-pulse` → `xhs-viral-rewrite` (uses TOP 30 as input for persona-based rewrites)
 - `xhs-viral-pulse` → `xhs-trend-scan` (mines emerging concepts from same dataset)
 
+## Failure modes — feishu output is REQUIRED
+
+The skill **must** end with a Feishu doc URL handed back to the user. If feishu push fails for any reason, **stop and ask the user to fix the configuration**. Do NOT silently degrade to local-only output.
+
+| Failure | Action |
+|---|---|
+| `lark-cli` binary not in PATH | STOP. Tell user to install lark-cli per [setup/02_install_lark_cli.md](../../setup/02_install_lark_cli.md). |
+| `lark-cli` auth expired (`LarkAuthExpired`) | STOP. Tell user: `lark-cli auth login --as bot` |
+| Bot lacks scope (`LarkScopeMissing`) | STOP. Show the `scope_url` from the error; user grants in 1 click in 飞书 console. |
+| `config.yaml` missing `feishu.folder_token` | STOP. Tell user to edit `config.yaml`. |
+
+Local markdown / JSON / xlsx files saved during the run are intermediate artifacts — they are **not** the deliverable.
+
 ## Examples
 
 See [examples.md](examples.md) for a full sample report.

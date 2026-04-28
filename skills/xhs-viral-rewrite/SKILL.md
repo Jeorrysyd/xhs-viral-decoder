@@ -59,6 +59,20 @@ See [workflow.md](workflow.md).
 - **Required input**: `xhs-viral-pulse` output (directory with analysis.json + report.md)
 - **Required input**: `xhs-persona-synth` output (persona JSON)
 
+## Failure modes — feishu output is REQUIRED
+
+The skill **must** end with a Feishu doc URL handed back to the user (the updated viral-pulse doc with §六 appended). If feishu push fails for any reason, **stop and ask the user to fix the configuration**. Do NOT silently degrade to local-only output.
+
+| Failure | Action |
+|---|---|
+| `lark-cli` binary not in PATH | STOP. Tell user to install lark-cli per [setup/02_install_lark_cli.md](../../setup/02_install_lark_cli.md). |
+| `lark-cli` auth expired (`LarkAuthExpired`) | STOP. Tell user: `lark-cli auth login --as bot` |
+| Bot lacks scope (`LarkScopeMissing`) | STOP. Show the `scope_url` from the error; user grants in 1 click in 飞书 console. |
+| `feishu_artifacts.json` missing in viral-pulse output | STOP. Tell user to re-run viral-pulse first so the original Feishu doc exists. |
+| `config.yaml` missing `feishu.folder_token` | STOP. Tell user to edit `config.yaml`. |
+
+Local markdown / JSON files saved during the run are intermediate artifacts — they are **not** the deliverable.
+
 ## Examples
 
 See [examples.md](examples.md) and [../../examples/viral_rewrite_sample.md](../../examples/viral_rewrite_sample.md).

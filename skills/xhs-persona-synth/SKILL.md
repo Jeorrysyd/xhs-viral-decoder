@@ -27,10 +27,11 @@ python3 shared/lib/cli.py persona-synth --nickname "真相拆解师"
 
 ## What it produces
 
-Two artifacts:
+**Primary deliverable**: an editable persona docx in your Feishu folder. This is the source of truth — the user reads it, edits it, and refers back to it.
 
-1. **`persona/<nickname>.json`** — machine-readable persona consumed by other skills
-2. **Feishu docx** — human-readable + editable persona file for ongoing tuning
+**Intermediate artifact** (saved locally for debugging): `persona/<nickname>.json` — machine-readable persona consumed by downstream skills (`xhs-viral-rewrite`, `xhs-viral-pulse --persona ...`).
+
+If feishu push fails, the skill stops with an error (see `## Failure modes` below). The local JSON is left behind for inspection but the run is **not** considered successful — there's no "fall back to local-only" path.
 
 Persona schema (key fields):
 - `core_tags` (1-3) — primary IP labels
@@ -65,6 +66,21 @@ The Feishu docx is editable. After editing, sync back: `python3 shared/lib/cli.p
 
 - **Required by**: `xhs-viral-rewrite` (must have a persona)
 - **Required by**: `xhs-viral-pulse --persona X` mode
+
+## Failure modes — feishu output is REQUIRED
+
+The skill **must** end with a Feishu doc URL handed back to the user. If feishu push fails for any reason, **stop and ask the user to fix the configuration**. Do NOT silently degrade to local-only output (that's the bug this section exists to prevent — see commit history).
+
+| Failure | Action |
+|---|---|
+| `lark-cli` binary not in PATH | STOP. Tell user to install lark-cli per [setup/02_install_lark_cli.md](../../setup/02_install_lark_cli.md). |
+| `lark-cli` auth expired (`LarkAuthExpired`) | STOP. Tell user: `lark-cli auth login --as bot` |
+| Bot lacks scope (`LarkScopeMissing`) | STOP. Show the `scope_url` from the error; user grants in 1 click in 飞书 console. |
+| `config.yaml` missing `feishu.folder_token` | STOP. Tell user to edit `config.yaml`. |
+
+The local `persona/<nickname>.json` is an intermediate artifact for downstream skills — it is **not** a successful deliverable on its own.
+
+For workflow-level failure modes (low note count, empty bio, off-niche), see [workflow.md](workflow.md).
 
 ## Examples
 

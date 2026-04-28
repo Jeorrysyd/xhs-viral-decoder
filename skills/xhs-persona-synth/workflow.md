@@ -99,7 +99,8 @@ adapter.push_doc(
 | Account has < 5 notes | Use bio + niche default → low-confidence persona, `needs_user_review` urgent |
 | Bio is empty | Use niche default substratum → flag user to fill bio first |
 | Multi-substratum tied (top 2 within 5 points) | Output 2 candidate personas, ask user to pick |
-| Off-niche (food, fashion) | Skill currently scoped to 心理/成长/职场; abort with clear message |
+| Off-niche (food, fashion, AI) | Run with default substratum lens; flag `needs_user_review` so the user can rename sub-stratum to fit their vertical. (The 6 sub-strata are showcase/reference, not a hard taxonomy — see SKILL.md) |
+| **Feishu push failed** (lark-cli missing / auth expired / scope insufficient / folder_token wrong) | **STOP. Surface error to user with config fix instructions. Do NOT silently fall back to local JSON.** See `SKILL.md` `## Failure modes` for the full table. |
 
 ## Tunable parameters
 
