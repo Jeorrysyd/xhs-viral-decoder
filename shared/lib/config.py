@@ -56,7 +56,19 @@ def _parse_simple_yaml(text: str) -> dict:
     stack: list = [(result, -1)]  # (dict, indent_level)
 
     for raw_line in text.splitlines():
-        line = raw_line.split("#", 1)[0].rstrip()
+        # Strip comments — but respect quotes
+        stripped = raw_line
+        in_quote = False
+        quote_char = None
+        for i, c in enumerate(raw_line):
+            if c in ('"', "'") and not in_quote:
+                in_quote, quote_char = True, c
+            elif c == quote_char and in_quote:
+                in_quote = False
+            elif c == '#' and not in_quote:
+                stripped = raw_line[:i]
+                break
+        line = stripped.rstrip()
         if not line.strip():
             continue
         indent = len(line) - len(line.lstrip())

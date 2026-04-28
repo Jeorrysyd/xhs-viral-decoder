@@ -40,7 +40,7 @@ fi
 ok "lark-cli 已配置飞书应用"
 
 # ── 3. 自动检测 open_id ──
-OPEN_ID=$(echo "$CONFIG_JSON" | grep -o 'ou_[a-f0-9]\{32\}' | head -1 || echo "")
+OPEN_ID=$(echo "$CONFIG_JSON" | grep -o 'ou_[a-f0-9]\{20,40\}' | head -1 || echo "")
 if [ -z "$OPEN_ID" ]; then
   warn "无法从 lark-cli config 自动检测 open_id"
   echo "   请手动输入你的飞书 open_id（格式：ou_xxxxxxxx）："

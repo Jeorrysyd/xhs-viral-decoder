@@ -49,4 +49,4 @@ defaults:
   persona: ""   # 留空，每次跑命令时显式指定 --persona <name>
 ```
 
-然后每个 persona 用 `xhs-persona-synth --nickname X` 各生成一份，存到 `persona/` 目录。
+然后每个 persona 用 `vd persona-init --nickname X` 各生成一份，存到 `persona/` 目录。

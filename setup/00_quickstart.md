@@ -9,6 +9,9 @@
 ### Step 1 · 装小红书数据源
 
 ```bash
+# Python 依赖（xlsx 输出需要）
+pip install openpyxl
+
 mkdir -p ~/tools/xiaohongshu-mcp && cd ~/tools/xiaohongshu-mcp
 curl -L -o xhs-mcp.tar.gz \
   https://github.com/xpzouying/xiaohongshu-mcp/releases/latest/download/xiaohongshu-mcp-darwin-arm64.tar.gz

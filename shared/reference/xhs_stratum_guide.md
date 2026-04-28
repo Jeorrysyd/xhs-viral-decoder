@@ -1,6 +1,6 @@
 # 小红书圈层 Lens — Persona 自动生成的理解框架
 
-> 这份文档是 `vd persona init` 的"理解透镜"。读取一个账号的 raw data（bio + 笔记列表 + detail）后，按这套框架解读，再合成 persona JSON。
+> 这份文档是 `vd persona-init` 的"理解透镜"。读取一个账号的 raw data（bio + 笔记列表 + detail）后，按这套框架解读，再合成 persona JSON。
 >
 > 目标：**站在小红书博主圈层视角**理解一个账号，而不是简单的 NLP/词频。
 

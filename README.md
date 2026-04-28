@@ -83,6 +83,9 @@ git clone https://github.com/Jeorrysyd/xhs-viral-decoder \
 # clone skill
 git clone https://github.com/Jeorrysyd/xhs-viral-decoder ~/.claude/skills/xhs-viral-decoder
 
+# 装 Python 依赖
+pip install openpyxl
+
 # 装 xhs-mcp（小红书数据抓取），详见 setup/01
 # macOS arm64 一行搞定：
 mkdir -p ~/tools/xiaohongshu-mcp && cd ~/tools/xiaohongshu-mcp

@@ -31,13 +31,13 @@ For richer voice signal extraction. Fail-tolerant (xhs 风控 may block top note
 Reference: [../../shared/reference/xhs_stratum_guide.md](../../shared/reference/xhs_stratum_guide.md)
 
 ```python
-from shared.lib.persona_synth import classify_substratum, synthesize
+from shared.lib.persona_synth import score_substratum, synthesize_persona
 
-substratum, scores = classify_substratum(profile, feeds, top_details)
+substratum, scores = score_substratum(profile, feeds, top_details)
 # substratum ∈ {cognitive, healing, howto, academic, womens_growth, lifestyle}
 # scores: dict showing votes per substratum (for transparency)
 
-persona = synthesize(profile, feeds, top_details, substratum)
+persona = synthesize_persona(profile, feeds, top_details, substratum)
 ```
 
 ### Step 5: Voting rules (sub-stratum classification)

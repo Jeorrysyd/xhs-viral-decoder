@@ -90,7 +90,7 @@ lark-cli drive permission.members create \
 
 **修复方式**：
 - 直接编辑 `persona/<name>.json`
-- 或在飞书里编辑 `[人设档案] <name>` docx 然后跑 `vd persona-sync --from-feishu --nickname <name>`
+- 或在飞书里编辑 `[人设档案] <name>` docx，然后手动把改动同步到 `persona/<name>.json`（自动同步功能开发中）
 
 ### Persona 自动归到错误的子圈层
 **原因**：bio 信号弱 + 你的内容混合多种类型。

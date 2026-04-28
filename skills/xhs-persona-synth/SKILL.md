@@ -18,11 +18,11 @@ User wants to bootstrap a persona from their own (or someone else's) xhs account
 
 ```bash
 # Option A: by URL
-python3 shared/lib/cli.py persona-synth \
+python3 shared/lib/cli.py persona-init \
   --url "https://www.xiaohongshu.com/user/profile/<id>?xsec_token=..."
 
 # Option B: by nickname (skill auto-resolves URL via search)
-python3 shared/lib/cli.py persona-synth --nickname "真相拆解师"
+python3 shared/lib/cli.py persona-init --nickname "真相拆解师"
 ```
 
 ## What it produces
@@ -60,7 +60,7 @@ The auto-synth marks `needs_user_review: true` because:
 - `voice_signature_phrases` based on title patterns may miss spoken-style phrases
 - `constraints` may need refinement after running first rewrite
 
-The Feishu docx is editable. After editing, sync back: `python3 shared/lib/cli.py persona-sync --from-feishu --nickname X`.
+The Feishu docx is editable. After editing, sync back by manually copying changes to `persona/<nickname>.json`. (Automated sync from Feishu is planned but not yet implemented.)
 
 ## Composition with other skills
 

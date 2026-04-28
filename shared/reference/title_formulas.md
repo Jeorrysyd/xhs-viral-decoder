@@ -176,7 +176,7 @@
 
 ## ROI 排序的统计方法
 
-`xhs-viral-pulse` 在 §五·5.4 输出 ROI 表：
+`xhs-viral-pulse` 在 §五·5.3 输出 ROI 表：
 
 ```
 ROI = (TOP30 中命中此公式的笔记数) / (全样本中此公式的笔记数) × 100%

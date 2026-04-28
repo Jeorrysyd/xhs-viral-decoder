@@ -22,6 +22,7 @@
   "dependencies": {
     "xhs-mcp": ">=v2026.04.17",
     "lark-cli": ">=1.0.19",
-    "python": ">=3.9"
+    "python": ">=3.9",
+    "openpyxl": ">=3.0"
   }
 }
